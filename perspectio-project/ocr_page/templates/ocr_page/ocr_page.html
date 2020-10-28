@@ -1,0 +1,96 @@
+{%extends 'base.html'%}
+{%load static%}
+
+{%block header%}
+<h1>OCR</h1>
+<h2>with this free easy to use online OCR (Optical Character Recognition) tool. You can easily scan the
+  text in your photos safely, easy and fast.</h2>
+{%endblock%}
+{% block content %}
+
+<section id="online_tools" class="online_tools section-bg">
+    <div class="container" data-aos="fade-up">
+        <div class="jumbotron shadow">
+            <div>
+                <form id="uploadform" method="post" action="{% url 'ocr_page' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class='uploadform'>
+                        <div id="wrapper">
+                            <i class="bx bx-upload"></i><br>
+                            <label for="fileUpload" class="custom-file-upload">Upload your images
+                            </label>
+                            <input class="inputfile" id="fileUpload" name="myFile" type="file"
+                                accept="image/gif, image/jpeg, image/png, image/jiff" multiple />
+                            <br>
+                            <div id="image-holder"></div>
+
+                        </div>
+                    </div>
+                    <br>
+                    <div class='uploadbtndiv'>
+                        <button type="submit" class="btn btn-primary pull-right" value=1 id="uploadbtn"
+                            name="uploadbtn">Upload</button></div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {%if uploaded_file_urls %}
+    <form id="uploadform" method="post" action="{% url 'ocr_page' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <section id="portfolio" class="portfolio">
+
+
+
+            <div class="container aos-init aos-animate" data-aos="fade-up">
+                <div class="row portfolio-container aos-init aos-animate" data-aos="fade-up" data-aos-delay="200"
+                    style="position: relative; height: 1080.35px;">
+                    <div class="portfolio-item filter-app" style="position: absolute; left: 0px; top: 0px;">
+                        <div class="jumbotron shadow">
+                            <div class="progress">
+                                <div id="myBar" class="progress-bar" role="progressbar" style="width: 0.0001%"
+                                    aria-valuenow="1" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <br>
+                            <div class="row">
+                                {% for i in uploaded_file_urls%}
+                                <div class="col-lg-6 col-md-6 {% cycle 'show' 'd-none' 'd-none' 'd-none' 'd-none'  %}">
+
+                                    <div class="portfolio-img"><img src="{{i}}" class="img-fluid" alt="">
+
+                                    </div>
+                                    <div class="portfolio-info">
+                                        <h4>Preview Images</h4>
+                                        <a href="{{i}}" data-gall="portfolioGallery"
+                                            class="venobox preview-link vbox-item"><i class="bx bx-images"></i></a>
+                                        <a class="details-link" title="More Details"><i class="bx bx-crop"></i></a>
+
+                                    </div>
+                                </div>
+                                <br>
+                                {%endfor%}
+                                <div class="col-lg-6 col-md-6">
+                                    <textarea id="textie" class="form-control" rows="10">{{ocr}}</textarea>
+                                    <br>
+                                    <!-- Rounded switch -->
+                                    Handwriting
+                                    <br>
+                                    <label class="switch">
+                                        <input name="handwriting" type="checkbox">
+                                        <span class="slider round"></span>
+                                    </label>
+                                    <button type="submit" class="btn btn-primary" name="ocrbtn"
+                                        value="{{uploaded_file_urls}}" id="ocrbtn" onclick="move()">OCR</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+    </form>
+</section>
+{%endif%}
+</section>
+
+
+{% endblock %}
