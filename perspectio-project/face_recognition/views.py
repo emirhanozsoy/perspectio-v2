@@ -88,7 +88,6 @@ def face_recognition(request):
 
     if request.method == 'POST' and request.POST.get("recognize"):
         print(request.POST)
-        ocr = ''
         liste = list(request.POST.get("recognize").replace('[', '').replace(']', '').replace('\'', '').replace(' ', '').split(","))
         print(liste)
         for i in liste:
@@ -98,13 +97,11 @@ def face_recognition(request):
                     image = Image.open(i[1:])
                     rgb_im = image.convert('RGB')
                     draw = ImageDraw.Draw(image)
-                    print(face.bounding_poly.vertices[0].x, face.bounding_poly.vertices[0].y,
-                          face.bounding_poly.vertices[3].x, face.bounding_poly.vertices[3].y)
                     draw.rectangle(((face.bounding_poly.vertices[0].x, face.bounding_poly.vertices[0].y), (
-                        face.bounding_poly.vertices[2].x, face.bounding_poly.vertices[2].y)), outline="#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)]),  width=10)
+                        face.bounding_poly.vertices[2].x, face.bounding_poly.vertices[2].y)), outline="#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)]),  width=5)
 
                     image.save(i[1:])
 
-        return render(request, 'face_recognition/face_recognition.html', {'uploaded_file_urls': liste, 'ocr': ocr})
+        return render(request, 'face_recognition/face_recognition.html', {'uploaded_file_urls': liste})
 
     return render(request, 'face_recognition/face_recognition.html')
