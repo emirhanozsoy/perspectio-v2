@@ -33,6 +33,15 @@
             </div>
         </div>
     </div>
+    {%if error2%}
+    <div class="alert alert-danger alert-dismissible" style="width:100%" role="alert">
+        <strong>There has been error with the format of image. Please try again with different format.</strong> If you
+        want to give us feedback please <a href="mailto: info@perspect-io.com">contact us.</a><button type="button"
+            class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {%endif%}
     {%if uploaded_file_urls %}
     <form id="uploadform" method="post" action="{% url 'logo_recognition' %}" enctype="multipart/form-data">
         {% csrf_token %}
@@ -44,6 +53,15 @@
                         <div class="portfolio-item filter-app" style="position: absolute; left: 0px; top: 0px;">
                             <div class="row">
                                 {% for i in uploaded_file_urls%}
+                                {%if nologo%}
+                                <div class="alert alert-warning alert-dismissible" style="width:100%" role="alert">
+                                    <strong>No logo was found! </strong>If you think there should be logo in the image
+                                    <a href="mailto: info@perspect-io.com">contact us.</a><button type="button"
+                                        class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                {%endif%}
                                 <div class="{% cycle 'show' 'd-none' 'd-none' 'd-none' 'd-none'  %}">
 
                                     <div class="portfolio-img"><img src="{{i}}" class="img-fluid" alt="">

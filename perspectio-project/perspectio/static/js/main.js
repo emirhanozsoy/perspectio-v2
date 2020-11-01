@@ -289,3 +289,58 @@ $("#ocrbtn").click(function () {
 
   move();
 });
+
+$("#contactform").validate({
+  rules: {
+    // simple rule, converted to {required:true}
+    name: "required",
+    // compound rule
+    email: {
+      required: true,
+      email: true
+    },
+    subject: {
+      required: true
+    },
+    message: {
+      required: true
+    }
+  }
+});
+
+$("#alert-success").fadeTo(2000, 500).slideUp(500, function(){
+  $("#alert-success").slideUp(500);
+});
+
+$("#send").click(function () {
+  if($("#contactform").valid()){
+    var csrftoken = $("[name=csrfmiddlewaretoken]").val();
+    var name=$("#name").val()
+    var email=$("#email").val()
+    var subject=$("#subject").val()
+    var message=$("#message").val()
+    var send = 1
+    $.post({
+        method: "POST",
+        url: "/",
+        headers: {
+            "X-CSRFToken": csrftoken
+        },
+        data: { send:send,name:name,email:email,subject:subject,message:message}
+    }).done(function (data) {
+        if (data.success) {
+  
+          $("#contactform")[0].reset()
+          $('.alert').removeClass('d-none');
+        }
+        // You can handle your redirection here
+    });
+
+  }
+//   else {
+//     alert("Values are not entered");
+//     //whatever you want to do when values are not entered
+// }
+
+ 
+});

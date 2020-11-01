@@ -33,9 +33,17 @@
             </div>
         </div>
     </div>
+    {%if error2%}
+    <div class="alert alert-danger alert-dismissible" style="width:100%" role="alert">
+        <strong>There has been error with the format of image. Please try again with different format.</strong> If you want to give us feedback please <a href="mailto: info@perspect-io.com">contact us.</a><button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+    {%endif%}
     {%if uploaded_file_urls %}
     <form id="uploadform" method="post" action="{% url 'face_recognition' %}" enctype="multipart/form-data">
         {% csrf_token %}
+        
         <section id="portfolio" class="portfolio">
             <div class="container aos-init aos-animate" data-aos="fade-up">
                 <div class="row portfolio-container aos-init aos-animate" data-aos="fade-up" data-aos-delay="200"
@@ -48,7 +56,16 @@
                             </div>
                             <br>
                             <div class="row">
+
                                 {% for i in uploaded_file_urls%}
+                                
+                                {%if noface%}
+                                <div class="alert alert-warning alert-dismissible" style="width:100%" role="alert">
+                                    <strong>No face was found! </strong>If you think there should be face in the image <a href="mailto: info@perspect-io.com">contact us.</a><button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                {%endif%}
                                 <div class="{% cycle 'show' 'd-none' 'd-none' 'd-none' 'd-none'  %}">
 
                                     <div class="portfolio-img"><img src="{{i}}" class="img-fluid" alt="">

@@ -7,7 +7,7 @@ import time
 import random
 import sqlite3
 import requests
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw,ImageFont
 from docx import Document
 from docx.shared import Inches
 from sqlite3 import Error
@@ -60,34 +60,52 @@ def detect_logos(path):
 # Create your views here.
 def logo_recognition(request):
 
-    print(request.POST)
+    return_dict={}
     uploaded_file_urls = []
+
     if request.method == 'POST' and 'myFile' in request.FILES and request.POST.get("uploadbtn"):
+        try:
+            myfile = request.FILES
+            for file in myfile.getlist('myFile'):
+                fs = FileSystemStorage()
+                filename = fs.save(get_filename('jpg'), file)
+                uploaded_file_urls.append(fs.url(filename))
 
-        myfile = request.FILES
-        for file in myfile.getlist('myFile'):
-            fs = FileSystemStorage()
-            filename = fs.save(get_filename('jpg'), file)
-            uploaded_file_urls.append(fs.url(filename))
+            return_dict= {'uploaded_file_urls': uploaded_file_urls}
+        except:
+            error2=1
+            return_dict= {'error2': error2}
 
-        return render(request, 'logo_recognition/logo_recognition.html', {'uploaded_file_urls': uploaded_file_urls})
+
+        return render(request, 'logo_recognition/logo_recognition.html', return_dict)
     
     if request.method == 'POST' and request.POST.get("recognize"):
-        print(request.POST)
+
         liste = list(request.POST.get("recognize").replace('[', '').replace(']', '').replace('\'', '').replace(' ', '').split(","))
-        print(liste)
-        for i in liste:
-            logos = detect_logos(str(i[1:]))
-            if logos:
-                for logo in logos:
-                    image = Image.open(i[1:])
-                    rgb_im = image.convert('RGB')
-                    draw = ImageDraw.Draw(image)
-                    draw.rectangle(((logo.bounding_poly.vertices[0].x, logo.bounding_poly.vertices[0].y), (
-                        logo.bounding_poly.vertices[2].x, logo.bounding_poly.vertices[2].y)), outline="#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)]),  width=5)
+        try:
 
-                    image.save(i[1:])
+            for i in liste:
+                logos = detect_logos(str(i[1:]))
+                if logos:
+                    for logo in logos:
+                        image = Image.open(i[1:])
+                        rgb_im = image.convert('RGB')
+                        draw = ImageDraw.Draw(image)
+                        color="#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+                        font_type = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 28, encoding="unic")
+                        draw.text((logo.bounding_poly.vertices[0].x+10,logo.bounding_poly.vertices[0].y-30), logo.description, font=font_type, fill=color)
+                        draw.rectangle(((logo.bounding_poly.vertices[0].x, logo.bounding_poly.vertices[0].y), (
+                            logo.bounding_poly.vertices[2].x, logo.bounding_poly.vertices[2].y)), outline=color,  width=5)
 
-        return render(request, 'logo_recognition/logo_recognition.html', {'uploaded_file_urls': liste})
+                        image.save(i[1:])
+                    return_dict={'uploaded_file_urls': liste}
+                else:
+                    nologo=1
+                    return_dict= {'uploaded_file_urls': liste,'nologo':nologo}
+        except:
+            error2=1
+            return_dict= {'error2': error2}
+
+        return render(request, 'logo_recognition/logo_recognition.html', return_dict)
 
     return render(request,'logo_recognition/logo_recognition.html')

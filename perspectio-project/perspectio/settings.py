@@ -1,3 +1,4 @@
+
 import os
 from pathlib import Path
 
@@ -12,9 +13,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'aqdy5=-f#qy%peomukks^u$veyhx*9sjhh@mrixd2!!wg^=e+t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['0.0.0.0','34.89.138.108','perspect-io.com','www.perspect-io.com']
 
 
 # Application definition
@@ -26,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
     'homepage',
     'ocr_page',
     'face_recognition',
@@ -119,3 +121,11 @@ STATICFILES_DIRS = (
 )
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+EMAIL_HOST='smtpout.secureserver.net'
+EMAIL_PORT=465
+EMAIL_HOST_USER='info@perspect-io.com'
+EMAIL_HOST_PASSWORD='183goldenkinG381?'
+EMAIL_USE_TLS=False
+EMAIL_USE_SSL=True

@@ -1,0 +1,3 @@
+User-agent: *
+Disallow: /media/
+Sitemap: https://perspect-io.com/sitemap.xml

@@ -92,43 +92,52 @@ def get_filename(extension):
 
 # Create your views here.
 def ocr_page(request):
-    print(request.POST)
+    return_dict={}
     uploaded_file_urls=[]
-    if request.method == 'POST' and 'myFile' in request.FILES and request.POST.get("uploadbtn"):
+    
+    try:
+        if request.method == 'POST' and 'myFile' in request.FILES and request.POST.get("uploadbtn"):
+            
+            myfile= request.FILES
+            for file in myfile.getlist('myFile'):
+                fs = FileSystemStorage()
+                filename = fs.save(get_filename('jpg'), file)
+                uploaded_file_urls.append(fs.url(filename))
+
+            return_dict={'uploaded_file_urls': uploaded_file_urls}
         
-        myfile= request.FILES
-        for file in myfile.getlist('myFile'):
-            fs = FileSystemStorage()
-            filename = fs.save(get_filename('jpg'), file)
-            uploaded_file_urls.append(fs.url(filename))
+        if request.method == 'POST' and request.POST.get("ocrbtn") and request.POST.get("handwriting"):
+            ocr=''
+            liste=list(request.POST.get("ocrbtn").replace('[', '').replace(']', '').replace('\'', '').replace(' ', '').split(","))
+            for i in liste:
+                pat=i[1:]
+                result=detect_handwriting(pat)
+                ocr=ocr+result
 
-        return render(request, 'ocr_page/ocr_page.html', {'uploaded_file_urls': uploaded_file_urls})
-    
-    if request.method == 'POST' and request.POST.get("ocrbtn") and request.POST.get("handwriting"):
-        ocr=''
-        liste=list(request.POST.get("ocrbtn").replace('[', '').replace(']', '').replace('\'', '').replace(' ', '').split(","))
-        print(liste)
-        for i in liste:
-            pat=i[1:]
-            print(pat)
-            result=detect_handwriting(pat)
-            ocr=ocr+result
+            if not ocr:
+                noocr='1'
+                return_dict={'uploaded_file_urls': liste,'noocr':noocr}
+            else:
+                return_dict= {'uploaded_file_urls': liste,'ocr':ocr}
 
-        return render(request, 'ocr_page/ocr_page.html', {'uploaded_file_urls': liste,'ocr':ocr})
+        elif request.method == 'POST' and request.POST.get("ocrbtn"):
 
-    if request.method == 'POST' and request.POST.get("ocrbtn"):
-        print(request.POST)
-        ocr=''
-        liste=list(request.POST.get("ocrbtn").replace('[', '').replace(']', '').replace('\'', '').replace(' ', '').split(","))
-        print(liste)
-        for i in liste:
-            pat=i[1:]
-            print(pat)
-            result=detect_text(pat)
-            ocr=ocr+result
+            ocr=''
+            liste=list(request.POST.get("ocrbtn").replace('[', '').replace(']', '').replace('\'', '').replace(' ', '').split(","))
 
-        return render(request, 'ocr_page/ocr_page.html', {'uploaded_file_urls': liste,'ocr':ocr})
-    
-    
+            for i in liste:
+                pat=i[1:]
+                result=detect_text(pat)
+                if result:
+                    ocr=ocr+result
+            if not ocr:
+                noocr='1'
+                return_dict= {'uploaded_file_urls': liste,'noocr':noocr}
+            else:
+                return_dict= {'uploaded_file_urls': liste,'ocr':ocr}
+    except:
+        error2=1
+        return_dict= {'error2': error2}
 
-    return render(request,'ocr_page/ocr_page.html')
+
+    return render(request,'ocr_page/ocr_page.html',return_dict)

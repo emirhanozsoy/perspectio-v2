@@ -66,46 +66,62 @@ def detect_landmarks(path):
 # Create your views here.
 def landmark_recognition(request):
 
-    print(request.POST)
+    return_dict={}
     uploaded_file_urls = []
+
     if request.method == 'POST' and 'myFile' in request.FILES and request.POST.get("uploadbtn"):
+        try:
+            myfile = request.FILES
+            for file in myfile.getlist('myFile'):
+                fs = FileSystemStorage()
+                filename = fs.save(get_filename('jpg'), file)
+                uploaded_file_urls.append(fs.url(filename))
 
-        myfile = request.FILES
-        for file in myfile.getlist('myFile'):
-            fs = FileSystemStorage()
-            filename = fs.save(get_filename('jpg'), file)
-            uploaded_file_urls.append(fs.url(filename))
-
-        return render(request, 'landmark_recognition/landmark_recognition.html', {'uploaded_file_urls': uploaded_file_urls})
+            return_dict= {'uploaded_file_urls': uploaded_file_urls}
+        except:
+            error2=1
+            return_dict= {'error2': error2}
+        
+        return render(request, 'landmark_recognition/landmark_recognition.html',return_dict)
 
     if request.method == 'POST' and request.POST.get("recognize"):
-        print(request.POST)
-        ocr = ''
+
+        latitude = ''
+        longitude = ''
         landmarks_names=[]
+
         liste = list(request.POST.get("recognize").replace('[', '').replace(']', '').replace('\'', '').replace(' ', '').split(","))
- 
-        for i in liste:
-            landmarks = detect_landmarks(str(i[1:]))
-            if landmarks:
-                for landmark in landmarks:
-                    if landmark.description not in landmarks_names:
-                        print(landmark.description)
-                        print(landmark)
-                        color="#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
-                        image = Image.open(i[1:])
-                        rgb_im = image.convert('RGB')
-                        draw = ImageDraw.Draw(image)
-                        draw.rectangle(((landmark.bounding_poly.vertices[0].x, landmark.bounding_poly.vertices[0].y), (landmark.bounding_poly.vertices[2].x, landmark.bounding_poly.vertices[2].y)), outline=color,  width=5)
-                        draw.text((landmark.bounding_poly.vertices[0].x+10,landmark.bounding_poly.vertices[0].y+10), landmark.description, font=ImageFont.truetype("arial",14), fill=color)
-                        landmarks_names.append(landmark.description)
-                        image.save(i[1:])
-                        for location in landmark.locations:
-                            lat_lng = location.lat_lng
-                            latitude=lat_lng.latitude
-                            longitude=lat_lng.longitude
+        try:
+            for i in liste:
+                landmarks = detect_landmarks(str(i[1:]))
+                if landmarks:
+                    for landmark in landmarks:
+                        if landmark.description not in landmarks_names:
+                            print(landmark.description)
+                            print(landmark)
+                            color="#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)])
+                            image = Image.open(i[1:])
+                            rgb_im = image.convert('RGB')
+                            draw = ImageDraw.Draw(image)
+                            font_type = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 28, encoding="unic")
+                            draw.text((landmark.bounding_poly.vertices[0].x+10,landmark.bounding_poly.vertices[0].y-30), landmark.description, font=font_type, fill=color)
+                            draw.rectangle(((landmark.bounding_poly.vertices[0].x, landmark.bounding_poly.vertices[0].y), (landmark.bounding_poly.vertices[2].x, landmark.bounding_poly.vertices[2].y)), outline=color,  width=5)
+                            landmarks_names.append(landmark.description)
+                            image.save(i[1:])
+                            for location in landmark.locations:
+                                lat_lng = location.lat_lng
+                                latitude=lat_lng.latitude
+                                longitude=lat_lng.longitude
+                    url="https://maps.google.com/maps?q="+str(latitude) +","+str(longitude) +"&output=embed"
+                    return_dict={'uploaded_file_urls': liste,'latitude':latitude,'longitude':longitude,'url':url}
 
-
-        url="https://maps.google.com/maps?q="+str(latitude) +","+str(longitude) +"&output=embed"
-        return render(request, 'landmark_recognition/landmark_recognition.html', {'uploaded_file_urls': liste,'latitude':latitude,'longitude':longitude,'url':url})
+                else:
+                    nolandmark=1
+                    return_dict= {'uploaded_file_urls': liste,'nolandmark':nolandmark}
+        except:
+            error2=1
+            return_dict= {'error2': error2}
+       
+        return render(request, 'landmark_recognition/landmark_recognition.html', return_dict)
 
     return render(request, 'landmark_recognition/landmark_recognition.html')

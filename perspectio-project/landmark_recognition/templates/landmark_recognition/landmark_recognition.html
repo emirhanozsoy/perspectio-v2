@@ -12,6 +12,7 @@
     <div class="container" data-aos="fade-up">
         <div class="jumbotron shadow">
             <div>
+
                 <form id="uploadform" method="post" action="{% url 'landmark_recognition' %}"
                     enctype="multipart/form-data">
                     {% csrf_token %}
@@ -35,6 +36,15 @@
             </div>
         </div>
     </div>
+    {%if error2%}
+    <div class="alert alert-danger alert-dismissible" style="width:100%" role="alert">
+        <strong>There has been error with the format of image. Please try again with different format.</strong> If you
+        want to give us feedback please <a href="mailto: info@perspect-io.com">contact us.</a><button type="button"
+            class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {%endif%}
     {%if uploaded_file_urls %}
     <form id="uploadform" method="post" action="{% url 'landmark_recognition' %}" enctype="multipart/form-data">
         {% csrf_token %}
@@ -44,8 +54,17 @@
                     <div class="row portfolio-container aos-init aos-animate" data-aos="fade-up" data-aos-delay="200"
                         style="position: relative; height: 1080.35px;">
                         <div class="portfolio-item filter-app" style="position: absolute; left: 0px; top: 0px;">
-                           <div class="row">
+                            <div class="row">
                                 {% for i in uploaded_file_urls%}
+                                {%if nolandmark%}
+                                <div class="alert alert-warning alert-dismissible" style="width:100%" role="alert">
+                                    <strong>No landmark was found! </strong>If you think there should be landmark in the
+                                    image <a href="mailto: info@perspect-io.com">contact us.</a><button type="button"
+                                        class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                {%endif%}
                                 <div class="{% cycle 'show' 'd-none' 'd-none' 'd-none' 'd-none'  %}">
 
                                     <div class="portfolio-img"><img src="{{i}}" class="img-fluid" alt="">
@@ -62,22 +81,23 @@
                                 </div>
                                 <br>
                                 {%endfor%}
-                                
+
                             </div>
-                            
+
                         </div>
-                        
+
                     </div>
                     {% if url%}
-                                <iframe src="{{url}}" frameborder="0" style="border:0; width: 100%; height: 290px;"
-                                    allowfullscreen></iframe>
-                                {%endif%}
-                        <div class='uploadbtndiv'>
-                            <button type="submit" class="btn btn-primary" name="recognize"
-                                value="{{uploaded_file_urls}}" id="recognize">Recognize</button>
-                            </div> </div>
-
+                    <iframe src="{{url}}" frameborder="0" style="border:0; width: 100%; height: 290px;"
+                        allowfullscreen></iframe>
+                    {%endif%}
+                    <div class='uploadbtndiv'>
+                        <button type="submit" class="btn btn-primary" name="recognize" value="{{uploaded_file_urls}}"
+                            id="recognize">Recognize</button>
+                    </div>
                 </div>
+
+            </div>
     </form>
 </section>
 {%endif%}

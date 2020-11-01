@@ -73,35 +73,49 @@ def get_filename(extension):
 
 
 def face_recognition(request):
-
-    print(request.POST)
+    return_dict={}
+    # print(request.POST)
     uploaded_file_urls = []
     if request.method == 'POST' and 'myFile' in request.FILES and request.POST.get("uploadbtn"):
+        try:
 
-        myfile = request.FILES
-        for file in myfile.getlist('myFile'):
-            fs = FileSystemStorage()
-            filename = fs.save(get_filename('jpg'), file)
-            uploaded_file_urls.append(fs.url(filename))
+            myfile = request.FILES
+            for file in myfile.getlist('myFile'):
+                fs = FileSystemStorage()
+                filename = fs.save(get_filename('jpg'), file)
+                uploaded_file_urls.append(fs.url(filename))
 
-        return render(request, 'face_recognition/face_recognition.html', {'uploaded_file_urls': uploaded_file_urls})
+            return_dict= {'uploaded_file_urls': uploaded_file_urls}
+        except:
+            error2=1
+            return_dict= {'error2': error2}
+
+        return render(request, 'face_recognition/face_recognition.html',return_dict)
 
     if request.method == 'POST' and request.POST.get("recognize"):
-        print(request.POST)
+      
         liste = list(request.POST.get("recognize").replace('[', '').replace(']', '').replace('\'', '').replace(' ', '').split(","))
-        print(liste)
-        for i in liste:
-            faces = detect_faces(str(i[1:]))
-            if faces:
-                for face in faces:
-                    image = Image.open(i[1:])
-                    rgb_im = image.convert('RGB')
-                    draw = ImageDraw.Draw(image)
-                    draw.rectangle(((face.bounding_poly.vertices[0].x, face.bounding_poly.vertices[0].y), (
-                        face.bounding_poly.vertices[2].x, face.bounding_poly.vertices[2].y)), outline="#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)]),  width=5)
+        try:
+            for i in liste:
+                faces = detect_faces(str(i[1:]))
+                if faces:
+                    for face in faces:
+                        image = Image.open(i[1:])
+                        rgb_im = image.convert('RGB')
+                        draw = ImageDraw.Draw(image)
+                        draw.rectangle(((face.bounding_poly.vertices[0].x, face.bounding_poly.vertices[0].y), (
+                            face.bounding_poly.vertices[2].x, face.bounding_poly.vertices[2].y)), outline="#"+''.join([random.choice('0123456789ABCDEF') for j in range(6)]),  width=5)
+                        image.save(i[1:])
+                    return_dict= {'uploaded_file_urls': liste}
+                else:
+                    noface=1
+                    return_dict= {'uploaded_file_urls': liste,'noface':noface}
 
-                    image.save(i[1:])
+            
+        except:
+            error2=1
+            return_dict= {'error2': error2}
 
-        return render(request, 'face_recognition/face_recognition.html', {'uploaded_file_urls': liste})
+        return render(request, 'face_recognition/face_recognition.html',return_dict)
 
     return render(request, 'face_recognition/face_recognition.html')
