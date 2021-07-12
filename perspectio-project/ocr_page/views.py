@@ -15,6 +15,7 @@ from django.conf import settings
 from django.shortcuts import render
 from django.templatetags.static import static
 from django.shortcuts import render, redirect
+from google.cloud import translate_v2 as translate
 from django.core.files.storage import FileSystemStorage
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 
@@ -105,6 +106,20 @@ def ocr_page(request):
                 uploaded_file_urls.append(fs.url(filename))
 
             return_dict={'uploaded_file_urls': uploaded_file_urls}
+
+        if request.method == 'POST' and request.POST.get("translate") :
+            ocr = request.POST.get("translate")
+            print(ocr)
+            translate_client = translate.Client()
+
+            if isinstance(ocr, six.binary_type):
+                text = text.decode("utf-8")
+
+            result = translate_client.translate(ocr, target_language='tr')
+
+            print(result)
+
+
         
         if request.method == 'POST' and request.POST.get("ocrbtn") and request.POST.get("handwriting"):
             ocr=''

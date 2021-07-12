@@ -13,9 +13,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'aqdy5=-f#qy%peomukks^u$veyhx*9sjhh@mrixd2!!wg^=e+t'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['0.0.0.0','34.89.138.108','perspect-io.com','www.perspect-io.com']
+ALLOWED_HOSTS = ['127.0.0.1','0.0.0.0','34.89.138.108','perspect-io.com','www.perspect-io.com']
 
 
 # Application definition
